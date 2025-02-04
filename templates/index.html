@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yatırım Hesaplama</title>
+</head>
+<body>
+    <h1>Yatırım Hesaplama Aracı</h1>
+    <form id="investment-form">
+        <label for="stock_symbol">Hisse Senedi Kodu:</label>
+        <input type="text" id="stock_symbol" name="stock_symbol" required><br><br>
+
+        <label for="coffee_type">Kahve Tipi:</label>
+        <select id="coffee_type" name="coffee_type" required>
+            <option value="Small">Small</option>
+            <option value="Cappuccino">Cappuccino</option>
+            <option value="Fancy Latte">Fancy Latte</option>
+        </select><br><br>
+
+        <label for="start_year">Başlangıç Yılı:</label>
+        <input type="number" id="start_year" name="start_year" required><br><br>
+
+        <label for="end_year">Bitiş Yılı:</label>
+        <input type="number" id="end_year" name="end_year" required><br><br>
+
+        <button type="submit">Hesapla</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('investment-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+
+            fetch('/calculate', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('result').innerHTML = `<p style="color:red;">Hata: ${data.error}</p>`;
+                } else {
+                    document.getElementById('result').innerHTML = `
+                        <h2>Sonuçlar:</h2>
+                        <p>Toplam Yatırım: ${data["Total Investment"]} USD</p>
+                        <p>Yatırımın Bugünkü Değeri: ${data["Final Investment Value"]} USD</p>
+                        <p>Toplam Hisse: ${data["Total Shares Bought"]}</p>
+                    `;
+                }
+            })
+            .catch(err => {
+                document.getElementById('result').innerHTML = `<p style="color:red;">Hata: ${err.message}</p>`;
+            });
+        });
+    </script>
+</body>
+</html>
